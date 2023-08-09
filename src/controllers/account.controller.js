@@ -4,13 +4,13 @@ import {userExists ,getInfoFromUser, createUserSession, userCanLogin, createUser
 
 export async function signUp(req, res) {
 
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password, confirmPassword,cellphone,city } = req.body;
 
     try {
-        if (password !== confirmPassword) return res.status(422).send("Senhas precisam ser iguais!");
+        if (password !== confirmPassword) return res.status(422).send("Passwords need to be the same!");
         const alreadyHasUser = await userExists(email);
-        if (alreadyHasUser) return res.sendStatus(409);
-        await createUser(name,email,password);
+        if (alreadyHasUser) return res.status(409).send("There is already account using this email!");
+        await createUser(name,email,password,cellphone,city);
         return res.sendStatus(201);
     } catch (error) {
         console.log(error);

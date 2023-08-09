@@ -9,9 +9,9 @@ export async function userExists(email) {
     }
 }
 
-export async function createUser(name, email, password) {
+export async function createUser(name, email, password,cellphone,city) {
     try {
-        const user = await db.query(`INSERT INTO users ("name", "email" ,"password") VALUES ( $1, $2, $3 )`, [name, email, password]);
+        const user = await db.query(`INSERT INTO users ("name", "email" ,"password","cellphone","city_name") VALUES ( $1, $2, $3,$4,$5 )`, [name, email, password,cellphone,city]);
         return user;
     } catch (error) {
         return null;
