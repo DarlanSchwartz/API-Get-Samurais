@@ -23,7 +23,7 @@ export async function signIn(req, res) {
     try {
         const userCanLogIn = await userCanLogin(email,password);
 
-        if (!userCanLogIn) return res.sendStatus(401);
+        if (!userCanLogIn) return res.status(401).send("No samurai found with this email");
         
         const token = uuid();
 

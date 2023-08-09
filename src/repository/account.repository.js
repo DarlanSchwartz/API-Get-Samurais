@@ -31,20 +31,12 @@ export async function userCanLogin(email,password) {
 export async function getInfoFromUser(email) {
     try {
         const query = `
-            SELECT u.id, u.name,
-                   COALESCE(SUM(s."visitCount"), 0) AS "visitCount",
-                   array_agg(json_build_object('id', s.id, 'url', s.url, 'shortUrl', s.shorturl, 'visitCount', s."visitCount")) AS "shortenedUrls"
-            FROM users u
-            LEFT JOIN short_urls s ON u.id = s.owner_id
-            WHERE u.email = $1
-            GROUP BY u.id, u.name
+            SELECT * FROM users WHERE email=$1
         `;
         
         const userInfo = await db.query(query,[email]);
         
         const user = userInfo.rows[0];
-        user.visitCount = user.visitCount || 0;
-        if(userInfo.rows[0].shortenedUrls[0].id == null) userInfo.rows[0].shortenedUrls = [];
         return user;
     } catch (error) {
         return null;
