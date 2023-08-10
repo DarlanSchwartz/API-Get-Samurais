@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import {userExists ,getInfoFromUser, createUserSession, userCanLogin, createUser}from '../repository/account.repository.js';
+import {userExists ,getInfoFromUser, createUserSession, userCanLogin, createUser, getInfoFromUserEmail}from '../repository/account.repository.js';
+import { findUserServices } from '../repository/services.repository.js';
 
 
 export async function signUp(req, res) {
@@ -26,9 +27,9 @@ export async function signIn(req, res) {
         if (!userCanLogIn) return res.status(401).send("No samurai found with this email");
         
         const token = uuid();
-
-        await createUserSession(email,token);
-
+        
+        const user = await getInfoFromUserEmail(email);
+        await createUserSession(user.id,token);
         return res.status(200).send({ token });
     } catch (error) {
         console.log(error);
@@ -38,7 +39,13 @@ export async function signIn(req, res) {
 
 export async function getUserInfo(req, res) {
     try {
-        const user = await getInfoFromUser(res.locals.user.email);
+        const user = await getInfoFromUser(res.locals.user.user_id);
+        const userServices = await findUserServices(res.locals.user.user_id);
+        if(user)
+        {
+            delete user.password;
+            user.services = userServices;
+        }
         return res.status(200).send(user);
     } catch (error) {
         console.log(error);

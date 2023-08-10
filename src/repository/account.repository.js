@@ -28,7 +28,23 @@ export async function userCanLogin(email,password) {
     }
 }
 
-export async function getInfoFromUser(email) {
+export async function getInfoFromUser(id) {
+    try {
+        const query = `
+            SELECT * FROM users WHERE id=$1
+        `;
+        
+        const userInfo = await db.query(query,[id]);
+        
+        const user = userInfo.rows[0];
+        return user;
+    } catch (error) {
+        return null;
+    }
+}
+
+
+export async function getInfoFromUserEmail(email) {
     try {
         const query = `
             SELECT * FROM users WHERE email=$1
@@ -43,11 +59,12 @@ export async function getInfoFromUser(email) {
     }
 }
 
-export async function createUserSession(email,generatedToken) {
+export async function createUserSession(user_id,generatedToken) {
     try {
-        const session = await db.query(`INSERT INTO sessions ("email","token") VALUES ($1,$2)`, [email, generatedToken]);
+        const session = await db.query(`INSERT INTO sessions ("user_id","token") VALUES ($1,$2)`, [user_id, generatedToken]);
         return session;
     } catch (error) {
+        console.log(error);
         return null;
     }
 }
