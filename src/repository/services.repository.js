@@ -57,10 +57,39 @@ export async function changeServiceAvailableStatus(id,value) {
 
 export async function findService(id) {
     try {
-        const query = `SELECT services.*, users.name AS owner_name, users.city_name
-        FROM services
-        JOIN users ON services.owner_id = users.id
-        WHERE services.id = $1
+        const query = `
+            SELECT 
+                services.*, 
+                users.name AS owner_name, 
+                users.city_name,
+                COALESCE(
+                    (
+                        SELECT 
+                            json_agg(json_build_object('id', reviews.id, 'review_text', reviews.review_text, 'rating', reviews.rating)) 
+                        FROM 
+                            reviews 
+                        WHERE 
+                            reviews.service_id = services.id
+                    ),
+                    '[]'::json
+                ) AS reviews,
+                COALESCE(
+                    (
+                        SELECT 
+                            ROUND(AVG(reviews.rating), 2)
+                        FROM 
+                            reviews 
+                        WHERE 
+                            reviews.service_id = services.id
+                    ),
+                    0
+                ) AS overall_rating
+            FROM 
+                services
+            JOIN 
+                users ON services.owner_id = users.id
+            WHERE 
+                services.id = $1
         `;
         
         const service = await db.query(query,[id]);
@@ -71,6 +100,7 @@ export async function findService(id) {
         return null;
     }
 }
+
 
 export async function checkServiceOwnerShip(ownerId,serviceId) {
     try {
@@ -102,18 +132,56 @@ export async function removeService(id) {
 
 export async function findAllServices() {
     try {
-        const query = `SELECT services.*, users.name AS owner_name, users.city_name
-        FROM services
-        JOIN users ON services.owner_id = users.id
-        `;
+        const query = `
+        SELECT 
+            services.*, 
+            users.name AS owner_name, 
+            users.city_name,
+            COALESCE(
+                (
+                    SELECT 
+                        ROUND(AVG(reviews.rating), 2)
+                    FROM 
+                        reviews 
+                    WHERE 
+                        reviews.service_id = services.id
+                ),
+                0
+            ) AS overall_rating,
+            COALESCE(
+                (
+                    SELECT 
+                        json_agg(json_build_object(
+                            'id', reviews.id,
+                            'review_text', reviews.review_text,
+                            'rating', reviews.rating,
+                            'writer_name', writer.name
+                        )) 
+                    FROM 
+                        reviews 
+                    JOIN 
+                        users AS writer ON reviews.writer_id = writer.id 
+                    WHERE 
+                        reviews.service_id = services.id
+                ),
+                '[]'::json
+            ) AS reviews
+        FROM 
+            services
+        JOIN 
+            users ON services.owner_id = users.id
+    `;
         
         const services = await db.query(query,[]);
         
         return services.rows;
     } catch (error) {
+        console.log(error);
         return null;
     }
 }
+
+
 
 export async function findUserServices(userId) {
     try {
