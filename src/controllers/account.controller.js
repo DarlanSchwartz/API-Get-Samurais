@@ -11,7 +11,11 @@ export async function signUp(req, res) {
         if (password !== confirmPassword) return res.status(422).send("Passwords need to be the same!");
         const alreadyHasUser = await userExists(email);
         if (alreadyHasUser) return res.status(409).send("There is already account using this email!");
-        await createUser(name,email,password,cellphone,city);
+        const newUser = await createUser(name,email,password,cellphone,city);
+        if(newUser == null || newUser.message){
+            console.log("here");
+            return res.status(400).send(newUser.message);
+        }
         return res.sendStatus(201);
     } catch (error) {
         console.log(error);

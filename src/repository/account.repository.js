@@ -14,7 +14,7 @@ export async function createUser(name, email, password,cellphone,city) {
         const user = await db.query(`INSERT INTO users ("name", "email" ,"password","cellphone","city_name") VALUES ( $1, $2, $3,$4,$5 )`, [name, email, password,cellphone,city]);
         return user;
     } catch (error) {
-        return null;
+        return error;
     }
 }
 
