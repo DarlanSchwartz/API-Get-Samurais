@@ -62,6 +62,7 @@ export async function findService(id) {
         services.*, 
         users.name AS owner_name, 
         users.city_name,
+        users.cellphone AS owner_phone,
         COALESCE(
             (
                 SELECT 
@@ -145,6 +146,7 @@ export async function findAllServices() {
         services.*, 
         users.name AS owner_name, 
         users.city_name,
+        users.cellphone AS owner_phone,
         COALESCE(
             (
                 SELECT 
@@ -199,6 +201,7 @@ export async function findUserServices(userId) {
         services.*, 
         users.name AS owner_name, 
         users.city_name,
+        users.cellphone AS owner_phone,
         COALESCE(
             (
                 SELECT 
