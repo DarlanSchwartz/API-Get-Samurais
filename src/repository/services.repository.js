@@ -71,7 +71,8 @@ export async function findService(id) {
                         'review_text', reviews.review_text, 
                         'rating', reviews.rating,
                         'writer_id', reviews.writer_id,
-                        'writer_name', u_writer.name
+                        'writer_name', u_writer.name,
+                        'created_at', reviews.created_at
                     )) 
                 FROM 
                     reviews 
@@ -166,7 +167,8 @@ export async function findAllServices() {
                         'review_text', reviews.review_text,
                         'rating', reviews.rating,
                         'writer_id', reviews.writer_id,
-                        'writer_name', writer.name
+                        'writer_name', writer.name,
+                        'created_at', reviews.created_at
                     )) 
                 FROM 
                     reviews 
@@ -221,7 +223,8 @@ export async function findUserServices(userId) {
                         'review_text', reviews.review_text,
                         'rating', reviews.rating,
                         'writer_id', reviews.writer_id,
-                        'writer_name', writer.name
+                        'writer_name', writer.name,
+                        'created_at', reviews.created_at
                     )) 
                 FROM 
                     reviews 
